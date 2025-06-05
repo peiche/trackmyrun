@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sun as Run, Flame, BarChart, Target, LogIn, LogOut, User, ChevronDown } from 'lucide-react';
+import { Footprints as Run, Flame, BarChart, Target, LogIn, LogOut, User, ChevronDown } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import AuthModal from '../auth/AuthModal';
 import Button from '../common/Button';
@@ -19,7 +19,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  
+
   const navItems: NavItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: <BarChart size={20} /> },
     { id: 'runs', label: 'My Runs', icon: <Run size={20} /> },
@@ -36,13 +36,13 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
     <>
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-center">
-            <div className="h-16 flex items-center justify-between">
-              <div className="flex items-center">
-                <Run className="h-8 w-8 text-blue-600" />
-                <span className="ml-2 text-xl font-bold text-gray-900 hidden sm:inline">RunTracker</span>
-              </div>
-              
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <Run className="h-8 w-8 text-gray-900" />
+              <span className="ml-2 text-xl font-bold text-gray-900">RunTracker</span>
+            </div>
+
+            <div className="flex space-x-4 items-center">
               {user ? (
                 <div className="relative">
                   <button
@@ -53,7 +53,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
                     <span className="hidden sm:inline">{user.email}</span>
                     <ChevronDown size={16} className={`transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
                   </button>
-                  
+
                   {showDropdown && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
                       <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
@@ -79,30 +79,31 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
                 </Button>
               )}
             </div>
-            
-            {user && (
-              <nav className="flex space-x-1 sm:space-x-4 pb-4 sm:pb-0 sm:ml-8 overflow-x-auto">
-                {navItems.map(item => (
-                  <button
-                    key={item.id}
-                    onClick={() => onTabChange(item.id)}
-                    className={`
-                      flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap
-                      ${activeTab === item.id 
-                        ? 'text-blue-700 bg-blue-50' 
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}
-                    `}
-                  >
-                    <span className="mr-2">{item.icon}</span>
-                    <span>{item.label}</span>
-                  </button>
-                ))}
-              </nav>
-            )}
           </div>
+
+          <nav className="flex space-x-4 items-center">
+
+
+            {user && navItems.map(item => (
+              <button
+                key={item.id}
+                onClick={() => onTabChange(item.id)}
+                className={`
+                    flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
+                    ${activeTab === item.id
+                    ? 'text-blue-700 bg-blue-50'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}
+                  `}
+              >
+                <span className="mr-2">{item.icon}</span>
+                <span className="hidden sm:inline">{item.label}</span>
+              </button>
+            ))}
+
+          </nav>
         </div>
       </header>
-      
+
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} />
       )}
