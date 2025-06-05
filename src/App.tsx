@@ -22,14 +22,36 @@ function App() {
   const [user, setUser] = useState<any>(null);
   
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
+    const initializeAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error || !session) {
+          // If there's an error or no session, sign out to clear any invalid tokens
+          await supabase.auth.signOut();
+          setUser(null);
+          return;
+        }
+        
+        setUser(session.user);
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        // On any error, sign out to ensure a clean state
+        await supabase.auth.signOut();
+        setUser(null);
+      }
+    };
+
+    initializeAuth();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+      } else {
+        setUser(null);
+      }
     });
 
     return () => subscription.unsubscribe();
