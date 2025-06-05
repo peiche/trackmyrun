@@ -36,28 +36,12 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
     <>
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Run className="h-8 w-8 text-blue-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900 hidden sm:inline">RunTracker</span>
-            </div>
-            
-            <nav className="flex space-x-4 items-center">
-              {user && navItems.map(item => (
-                <button
-                  key={item.id}
-                  onClick={() => onTabChange(item.id)}
-                  className={`
-                    flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
-                    ${activeTab === item.id 
-                      ? 'text-blue-700 bg-blue-50' 
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}
-                  `}
-                >
-                  <span className="mr-2">{item.icon}</span>
-                  <span className="hidden sm:inline">{item.label}</span>
-                </button>
-              ))}
+          <div className="flex flex-col sm:flex-row sm:items-center">
+            <div className="h-16 flex items-center justify-between">
+              <div className="flex items-center">
+                <Run className="h-8 w-8 text-blue-600" />
+                <span className="ml-2 text-xl font-bold text-gray-900 hidden sm:inline">RunTracker</span>
+              </div>
               
               {user ? (
                 <div className="relative">
@@ -94,7 +78,27 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
                   Login
                 </Button>
               )}
-            </nav>
+            </div>
+            
+            {user && (
+              <nav className="flex space-x-1 sm:space-x-4 pb-4 sm:pb-0 sm:ml-8 overflow-x-auto">
+                {navItems.map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => onTabChange(item.id)}
+                    className={`
+                      flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap
+                      ${activeTab === item.id 
+                        ? 'text-blue-700 bg-blue-50' 
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}
+                    `}
+                  >
+                    <span className="mr-2">{item.icon}</span>
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </nav>
+            )}
           </div>
         </div>
       </header>
