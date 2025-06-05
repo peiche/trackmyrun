@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Sun, Moon, Monitor } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { ChevronDown } from 'lucide-react';
@@ -21,11 +21,11 @@ const ThemeToggle: React.FC = () => {
           className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-colors"
         >
           <span className="flex items-center space-x-2">
-            {options.filter(o => o.value === colorMode).map(o => (
-              <>
-                {o.icon}
-                <span className="hidden sm:inline">{o.label}</span>
-              </>
+            {options.filter(option => option.value === colorMode).map((option, index) => (
+              <Fragment key={index}>
+                {option.icon}
+                <span className="hidden sm:inline">{option.label}</span>
+              </Fragment>
             ))}
           </span>
           <ChevronDown size={16} className={`transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
