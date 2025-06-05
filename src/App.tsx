@@ -11,6 +11,7 @@ import GoalsList from './components/goals/GoalsList';
 import GoalForm from './components/goals/GoalForm';
 import Button from './components/common/Button';
 import { AppProvider } from './context/AppContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { PlusCircle } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
@@ -21,12 +22,10 @@ function App() {
   const [user, setUser] = useState<any>(null);
   
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
     });
 
-    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -36,15 +35,14 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
   
-  // Render tab content based on active tab
   const renderTabContent = () => {
     if (!user) {
       return (
         <div className="text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             Welcome to RunTracker
           </h2>
-          <p className="text-gray-600 mb-8">
+          <p className="text-gray-600 dark:text-gray-400 mb-8">
             Please log in or sign up to start tracking your runs
           </p>
         </div>
@@ -93,7 +91,6 @@ function App() {
     }
   };
   
-  // Get tab title and action button based on active tab
   const getTabConfig = () => {
     if (!user) {
       return {
@@ -159,24 +156,26 @@ function App() {
   const tabConfig = getTabConfig();
   
   return (
-    <AppProvider>
-      <div className="min-h-screen bg-gray-50">
-        <Header 
-          activeTab={activeTab} 
-          onTabChange={setActiveTab}
-          user={user}
-        />
-        
-        <main>
-          <PageContainer 
-            title={tabConfig.title}
-            action={tabConfig.action}
-          >
-            {renderTabContent()}
-          </PageContainer>
-        </main>
-      </div>
-    </AppProvider>
+    <ThemeProvider>
+      <AppProvider>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+          <Header 
+            activeTab={activeTab} 
+            onTabChange={setActiveTab}
+            user={user}
+          />
+          
+          <main>
+            <PageContainer 
+              title={tabConfig.title}
+              action={tabConfig.action}
+            >
+              {renderTabContent()}
+            </PageContainer>
+          </main>
+        </div>
+      </AppProvider>
+    </ThemeProvider>
   );
 }
 
