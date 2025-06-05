@@ -1,5 +1,6 @@
 export interface Run {
   id: string;
+  user_id: string;
   date: string;
   distance: number; // in miles
   duration: number; // in minutes
@@ -11,6 +12,7 @@ export interface Run {
 
 export interface Goal {
   id: string;
+  user_id: string;
   name: string;
   target_date: string;
   target_distance?: number;

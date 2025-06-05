@@ -5,32 +5,45 @@ import { supabase } from '../lib/supabase';
 interface AppContextType {
   runs: Run[];
   goals: Goal[];
-  addRun: (run: Omit<Run, 'id'>) => Promise<void>;
-  updateRun: (id: string, run: Partial<Run>) => Promise<void>;
+  addRun: (run: Omit<Run, 'id' | 'user_id'>) => Promise<void>;
+  updateRun: (id: string, run: Partial<Omit<Run, 'id' | 'user_id'>>) => Promise<void>;
   deleteRun: (id: string) => Promise<void>;
-  addGoal: (goal: Omit<Goal, 'id'>) => Promise<void>;
-  updateGoal: (id: string, goal: Partial<Goal>) => Promise<void>;
+  addGoal: (goal: Omit<Goal, 'id' | 'user_id'>) => Promise<void>;
+  updateGoal: (id: string, goal: Partial<Omit<Goal, 'id' | 'user_id'>>) => Promise<void>;
   deleteGoal: (id: string) => Promise<void>;
   toggleGoalCompletion: (id: string) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+interface AppProviderProps {
+  children: ReactNode;
+  currentUserId: string | null;
+}
+
+export const AppProvider: React.FC<AppProviderProps> = ({ children, currentUserId }) => {
   const [runs, setRuns] = useState<Run[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
 
-  // Fetch runs and goals when the component mounts
+  // Fetch runs and goals when the component mounts or user changes
   useEffect(() => {
-    fetchRuns();
-    fetchGoals();
-  }, []);
+    if (currentUserId) {
+      fetchRuns();
+      fetchGoals();
+    } else {
+      setRuns([]);
+      setGoals([]);
+    }
+  }, [currentUserId]);
 
   // Fetch runs from Supabase
   const fetchRuns = async () => {
+    if (!currentUserId) return;
+
     const { data: runsData, error } = await supabase
       .from('runs')
       .select('*')
+      .eq('user_id', currentUserId)
       .order('date', { ascending: false });
 
     if (error) {
@@ -43,9 +56,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Fetch goals from Supabase
   const fetchGoals = async () => {
+    if (!currentUserId) return;
+
     const { data: goalsData, error } = await supabase
       .from('goals')
       .select('*')
+      .eq('user_id', currentUserId)
       .order('target_date', { ascending: true });
 
     if (error) {
@@ -57,10 +73,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   // Run functions
-  const addRun = async (run: Omit<Run, 'id'>) => {
+  const addRun = async (run: Omit<Run, 'id' | 'user_id'>) => {
+    if (!currentUserId) return;
+
     const { data, error } = await supabase
       .from('runs')
-      .insert([run])
+      .insert([{ ...run, user_id: currentUserId }])
       .select()
       .single();
 
@@ -72,11 +90,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setRuns(prev => [data, ...prev]);
   };
 
-  const updateRun = async (id: string, runUpdates: Partial<Run>) => {
+  const updateRun = async (id: string, runUpdates: Partial<Omit<Run, 'id' | 'user_id'>>) => {
+    if (!currentUserId) return;
+
     const { error } = await supabase
       .from('runs')
       .update(runUpdates)
-      .eq('id', id);
+      .eq('id', id)
+      .eq('user_id', currentUserId);
 
     if (error) {
       console.error('Error updating run:', error);
@@ -89,10 +110,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const deleteRun = async (id: string) => {
+    if (!currentUserId) return;
+
     const { error } = await supabase
       .from('runs')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .eq('user_id', currentUserId);
 
     if (error) {
       console.error('Error deleting run:', error);
@@ -103,10 +127,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   // Goal functions
-  const addGoal = async (goal: Omit<Goal, 'id'>) => {
+  const addGoal = async (goal: Omit<Goal, 'id' | 'user_id'>) => {
+    if (!currentUserId) return;
+
     const { data, error } = await supabase
       .from('goals')
-      .insert([goal])
+      .insert([{ ...goal, user_id: currentUserId }])
       .select()
       .single();
 
@@ -118,11 +144,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setGoals(prev => [data, ...prev]);
   };
 
-  const updateGoal = async (id: string, goalUpdates: Partial<Goal>) => {
+  const updateGoal = async (id: string, goalUpdates: Partial<Omit<Goal, 'id' | 'user_id'>>) => {
+    if (!currentUserId) return;
+
     const { error } = await supabase
       .from('goals')
       .update(goalUpdates)
-      .eq('id', id);
+      .eq('id', id)
+      .eq('user_id', currentUserId);
 
     if (error) {
       console.error('Error updating goal:', error);
@@ -135,10 +164,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const deleteGoal = async (id: string) => {
+    if (!currentUserId) return;
+
     const { error } = await supabase
       .from('goals')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .eq('user_id', currentUserId);
 
     if (error) {
       console.error('Error deleting goal:', error);
@@ -149,13 +181,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const toggleGoalCompletion = async (id: string) => {
+    if (!currentUserId) return;
+
     const goal = goals.find(g => g.id === id);
     if (!goal) return;
 
     const { error } = await supabase
       .from('goals')
       .update({ completed: !goal.completed })
-      .eq('id', id);
+      .eq('id', id)
+      .eq('user_id', currentUserId);
 
     if (error) {
       console.error('Error toggling goal completion:', error);
