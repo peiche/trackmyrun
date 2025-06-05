@@ -21,9 +21,9 @@ const GoalForm: React.FC<GoalFormProps> = ({ onClose, initialData }) => {
   
   const [formData, setFormData] = useState<Omit<Goal, 'id'>>({
     name: initialData?.name || '',
-    targetDate: initialData?.targetDate || defaultTargetDate,
-    targetDistance: initialData?.targetDistance || undefined,
-    targetPace: initialData?.targetPace || undefined,
+    target_date: initialData?.target_date || defaultTargetDate,
+    target_distance: initialData?.target_distance || undefined,
+    target_pace: initialData?.target_pace || undefined,
     description: initialData?.description || '',
     completed: initialData?.completed || false,
   });
@@ -63,19 +63,19 @@ const GoalForm: React.FC<GoalFormProps> = ({ onClose, initialData }) => {
       newErrors.name = 'Goal name is required';
     }
     
-    if (!formData.targetDate) {
+    if (!formData.target_date) {
       newErrors.targetDate = 'Target date is required';
     }
     
-    if (formData.targetDistance !== undefined && formData.targetDistance <= 0) {
+    if (formData.target_distance !== undefined && formData.target_distance <= 0) {
       newErrors.targetDistance = 'Target distance must be greater than 0';
     }
     
-    if (formData.targetPace !== undefined && formData.targetPace <= 0) {
+    if (formData.target_pace !== undefined && formData.target_pace <= 0) {
       newErrors.targetPace = 'Target pace must be greater than 0';
     }
     
-    if (!formData.targetDistance && !formData.targetPace) {
+    if (!formData.target_distance && !formData.target_pace) {
       newErrors.targetDistance = 'At least one target (distance or pace) is required';
     }
     
@@ -129,7 +129,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ onClose, initialData }) => {
             label="Target Date"
             type="date"
             name="targetDate"
-            value={formData.targetDate}
+            value={formData.target_date}
             onChange={handleChange}
             error={errors.targetDate}
             fullWidth
@@ -141,7 +141,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ onClose, initialData }) => {
             name="targetDistance"
             min="0"
             step="0.1"
-            value={formData.targetDistance === undefined ? '' : formData.targetDistance}
+            value={formData.target_distance === undefined ? '' : formData.target_distance}
             onChange={handleNumberChange}
             error={errors.targetDistance}
             placeholder="Optional"
@@ -154,14 +154,14 @@ const GoalForm: React.FC<GoalFormProps> = ({ onClose, initialData }) => {
             name="targetPace"
             min="0"
             step="0.1"
-            value={formData.targetPace === undefined ? '' : formData.targetPace}
+            value={formData.target_pace === undefined ? '' : formData.target_pace}
             onChange={handleNumberChange}
             error={errors.targetPace}
             placeholder="Optional"
             fullWidth
           />
           
-          <div className="flex items-center h-full pt-7">
+          <div className="flex items-center h-full pt-3">
             <input
               type="checkbox"
               name="completed"
@@ -172,7 +172,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ onClose, initialData }) => {
             />
             <label 
               htmlFor="completed" 
-              className="ml-2 block text-sm text-gray-700"
+              className="ml-2 block text-sm text-gray-700 dark:text-gray-300"
             >
               Mark as completed
             </label>
@@ -180,7 +180,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ onClose, initialData }) => {
         </div>
         
         <div className="mb-4 mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Description
           </label>
           <textarea
@@ -188,7 +188,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ onClose, initialData }) => {
             value={formData.description || ''}
             onChange={handleChange}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border text-gray-700 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             placeholder="Additional details about your goal"
           ></textarea>
         </div>

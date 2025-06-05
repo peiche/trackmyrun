@@ -12,7 +12,7 @@ const ThemeToggle: React.FC = () => {
   ] as const;
 
   return (
-    <div className="flex items-center space-x-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+    <div className="flex items-center space-x-2">
       {options.map(({ value, icon, label }) => (
         <button
           key={value}
@@ -21,7 +21,7 @@ const ThemeToggle: React.FC = () => {
             flex items-center space-x-2 px-3 py-1.5 rounded text-sm font-medium
             transition-colors duration-200
             ${colorMode === value
-              ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+              ? 'bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
               : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }
           `}

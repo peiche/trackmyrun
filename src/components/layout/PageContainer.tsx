@@ -18,7 +18,7 @@ const PageContainer: React.FC<PageContainerProps> = ({
           <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
           {action && <div>{action}</div>}
         </div>
-        <div className="bg-white overflow-hidden">
+        <div className="overflow-hidden">
           {children}
         </div>
       </div>

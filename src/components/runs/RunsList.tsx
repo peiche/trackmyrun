@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Card from '../common/Card';
-import Button from '../common/Button';
 import { useAppContext } from '../../context/AppContext';
 import { formatDate, formatPace, formatDuration } from '../../utils/calculations';
 import { Edit, Trash2, Search, Sun as Run } from 'lucide-react';
@@ -46,9 +45,9 @@ const RunsList: React.FC = () => {
                   placeholder="Search runs..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 pr-3 py-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="pl-9 pr-3 py-2 w-full text-gray-700 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-3.5 h-4 w-4 text-gray-400" />
               </div>
             </div>
           </div>
@@ -97,7 +96,7 @@ const RunsList: React.FC = () => {
                         {formatPace(run.pace)} /mi
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                        {getFeelingEmoji(run.feelingRating)}
+                        {getFeelingEmoji(run.feeling_rating)}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 max-w-[150px] truncate">
                         {run.route || '—'}
@@ -126,8 +125,8 @@ const RunsList: React.FC = () => {
           ) : (
             <div className="text-center py-12">
               <Run className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No runs found</h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No runs found</h3>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 {searchTerm ? 'Try a different search term or clear the search' : 'Start by logging your first run'}
               </p>
             </div>

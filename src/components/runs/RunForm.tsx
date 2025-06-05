@@ -24,7 +24,7 @@ const RunForm: React.FC<RunFormProps> = ({ onClose, initialData }) => {
     duration: initialData?.duration || 0,
     route: initialData?.route || '',
     notes: initialData?.notes || '',
-    feelingRating: initialData?.feelingRating || 3,
+    feeling_rating: initialData?.feeling_rating || 3,
   });
   
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -158,7 +158,7 @@ const RunForm: React.FC<RunFormProps> = ({ onClose, initialData }) => {
             label="How did you feel?"
             name="feelingRating"
             options={feelingOptions}
-            value={formData.feelingRating.toString()}
+            value={formData.feeling_rating.toString()}
             onChange={handleSelectChange('feelingRating')}
             fullWidth
           />
@@ -174,7 +174,7 @@ const RunForm: React.FC<RunFormProps> = ({ onClose, initialData }) => {
         />
         
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Notes
           </label>
           <textarea
@@ -182,7 +182,7 @@ const RunForm: React.FC<RunFormProps> = ({ onClose, initialData }) => {
             value={formData.notes || ''}
             onChange={handleChange}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border text-gray-700 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             placeholder="How was your run?"
           ></textarea>
         </div>

@@ -26,10 +26,10 @@ const StatCard: React.FC<StatCardProps> = ({
   color = 'blue' 
 }) => {
   const colorClasses = {
-    blue: 'bg-blue-50 text-blue-700',
-    green: 'bg-green-50 text-green-700',
-    purple: 'bg-purple-50 text-purple-700',
-    orange: 'bg-orange-50 text-orange-700',
+    blue: 'text-blue-700 dark:text-blue-300',
+    green: 'text-green-700 dark:text-green-300',
+    purple: 'text-purple-700 dark:text-purple-300',
+    orange: 'text-orange-700 dark:text-orange-300',
   } as { [key: string]: string };
 
   return (
@@ -39,10 +39,10 @@ const StatCard: React.FC<StatCardProps> = ({
           {icon}
         </div>
         <div className="ml-4">
-          <h3 className="text-sm font-medium text-gray-500">{title}</h3>
-          <p className="mt-1 text-2xl font-semibold text-gray-900">{value}</p>
+          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</h3>
+          <p className="mt-1 text-2xl font-semibold text-gray-900 dark:text-gray-100">{value}</p>
           {description && (
-            <p className="mt-1 text-xs text-gray-500">{description}</p>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{description}</p>
           )}
         </div>
       </div>

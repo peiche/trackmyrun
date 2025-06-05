@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Card from '../common/Card';
-import Button from '../common/Button';
 import { useAppContext } from '../../context/AppContext';
 import { formatDate, formatPace } from '../../utils/calculations';
 import { Edit, Trash2, CheckCircle, Target } from 'lucide-react';
@@ -16,7 +15,7 @@ const GoalsList: React.FC = () => {
     if (a.completed !== b.completed) {
       return a.completed ? 1 : -1; // Show incomplete goals first
     }
-    return new Date(a.targetDate).getTime() - new Date(b.targetDate).getTime();
+    return new Date(a.target_date).getTime() - new Date(b.target_date).getTime();
   });
   
   const getGoalProgress = (goal: Goal): React.ReactNode => {
@@ -28,7 +27,7 @@ const GoalsList: React.FC = () => {
       );
     }
     
-    const targetDate = new Date(goal.targetDate);
+    const targetDate = new Date(goal.target_date);
     const today = new Date();
     const diffTime = targetDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -77,7 +76,7 @@ const GoalsList: React.FC = () => {
                       {getGoalProgress(goal)}
                     </div>
                     <p className="text-sm text-gray-500 mt-1">
-                      Target date: {formatDate(goal.targetDate)}
+                      Target date: {formatDate(goal.target_date)}
                     </p>
                   </div>
                   
@@ -107,17 +106,17 @@ const GoalsList: React.FC = () => {
                 </div>
                 
                 <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {goal.targetDistance && (
+                  {goal.target_distance && (
                     <div className="bg-gray-50 rounded-md p-3">
                       <span className="text-xs text-gray-500 block">Target Distance:</span>
-                      <span className="font-medium">{goal.targetDistance} miles</span>
+                      <span className="font-medium">{goal.target_distance} miles</span>
                     </div>
                   )}
                   
-                  {goal.targetPace && (
+                  {goal.target_pace && (
                     <div className="bg-gray-50 rounded-md p-3">
                       <span className="text-xs text-gray-500 block">Target Pace:</span>
-                      <span className="font-medium">{formatPace(goal.targetPace)} per mile</span>
+                      <span className="font-medium">{formatPace(goal.target_pace)} per mile</span>
                     </div>
                   )}
                 </div>
@@ -132,8 +131,8 @@ const GoalsList: React.FC = () => {
           ) : (
             <Card className="text-center py-12">
               <Target className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No goals yet</h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No goals yet</h3>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Create your first running goal to track your progress
               </p>
             </Card>

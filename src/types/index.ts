@@ -6,15 +6,15 @@ export interface Run {
   pace: number; // in minutes per mile
   route?: string;
   notes?: string;
-  feelingRating: number; // 1-5 scale
+  feeling_rating: number; // 1-5 scale
 }
 
 export interface Goal {
   id: string;
   name: string;
-  targetDate: string;
-  targetDistance?: number;
-  targetPace?: number;
+  target_date: string;
+  target_distance?: number;
+  target_pace?: number;
   completed: boolean;
   description?: string;
 }
