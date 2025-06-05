@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sun as Run, Flame, BarChart, Target, LogIn, LogOut, User } from 'lucide-react';
+import { Sun as Run, Flame, BarChart, Target, LogIn, LogOut, User, ChevronDown } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import AuthModal from '../auth/AuthModal';
 import Button from '../common/Button';
@@ -18,6 +18,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
   
   const navItems: NavItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: <BarChart size={20} /> },
@@ -28,6 +29,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    setShowDropdown(false);
   };
 
   return (
@@ -58,19 +60,31 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
               ))}
               
               {user ? (
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center text-sm text-gray-700">
-                    <User size={16} className="mr-2" />
-                    <span>{user.email}</span>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleLogout}
-                    icon={<LogOut size={16} />}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowDropdown(!showDropdown)}
+                    className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
                   >
-                    Logout
-                  </Button>
+                    <User size={16} />
+                    <span className="hidden sm:inline">{user.email}</span>
+                    <ChevronDown size={16} className={`transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {showDropdown && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
+                      <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
+                        Signed in as<br />
+                        <span className="font-medium">{user.email}</span>
+                      </div>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center"
+                      >
+                        <LogOut size={16} className="mr-2" />
+                        Sign out
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <Button
