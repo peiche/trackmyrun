@@ -12,7 +12,9 @@ import {
   AreaChart,
   Area
 } from 'recharts';
-import { weeklyStats, monthlyStats } from '../../data/mockData';
+import { useAppContext } from '../../context/AppContext';
+import { startOfWeek, startOfMonth, format, subWeeks, subMonths } from 'date-fns';
+import { calculateTotalDistance, calculateAveragePace } from '../../utils/calculations';
 import { formatPace } from '../../utils/calculations';
 
 const PaceChart: React.FC<{ data: any[] }> = ({ data }) => {
@@ -27,7 +29,7 @@ const PaceChart: React.FC<{ data: any[] }> = ({ data }) => {
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis 
-              dataKey={data === weeklyStats ? "week" : "month"}
+              dataKey="period"
               axisLine={false}
               tickLine={false}
             />
@@ -40,7 +42,7 @@ const PaceChart: React.FC<{ data: any[] }> = ({ data }) => {
             />
             <Tooltip 
               formatter={(value: number) => [formatPace(value), 'Avg Pace']}
-              labelFormatter={(label) => `${data === weeklyStats ? 'Week of' : ''} ${label}`}
+              labelFormatter={(label) => label}
             />
             <Line 
               type="monotone" 
@@ -70,7 +72,7 @@ const MileageChart: React.FC<{ data: any[] }> = ({ data }) => {
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis 
-              dataKey={data === weeklyStats ? "week" : "month"}
+              dataKey="period"
               axisLine={false}
               tickLine={false}
             />
@@ -81,7 +83,7 @@ const MileageChart: React.FC<{ data: any[] }> = ({ data }) => {
             />
             <Tooltip 
               formatter={(value: number) => [`${value.toFixed(1)} miles`, 'Total Distance']}
-              labelFormatter={(label) => `${data === weeklyStats ? 'Week of' : ''} ${label}`}
+              labelFormatter={(label) => label}
             />
             <Area 
               type="monotone" 
@@ -117,7 +119,7 @@ const RunCountChart: React.FC<{ data: any[] }> = ({ data }) => {
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis 
-              dataKey={data === weeklyStats ? "week" : "month"}
+              dataKey="period"
               axisLine={false}
               tickLine={false}
             />
@@ -130,7 +132,7 @@ const RunCountChart: React.FC<{ data: any[] }> = ({ data }) => {
             />
             <Tooltip 
               formatter={(value: number) => [`${value} runs`, 'Run Count']}
-              labelFormatter={(label) => `${data === weeklyStats ? 'Week of' : ''} ${label}`}
+              labelFormatter={(label) => label}
             />
             <Area 
               type="monotone" 
@@ -156,7 +158,48 @@ const RunCountChart: React.FC<{ data: any[] }> = ({ data }) => {
 
 const ProgressCharts: React.FC = () => {
   const [timeRange, setTimeRange] = useState<'weekly' | 'monthly'>('weekly');
-  const data = timeRange === 'weekly' ? weeklyStats : monthlyStats;
+  const { runs } = useAppContext();
+  
+  // Generate stats based on actual run data
+  const generateStats = () => {
+    if (timeRange === 'weekly') {
+      return Array.from({ length: 12 }, (_, i) => {
+        const periodStart = startOfWeek(subWeeks(new Date(), i));
+        const periodEnd = startOfWeek(subWeeks(new Date(), i - 1));
+        
+        const periodRuns = runs.filter(run => {
+          const runDate = new Date(run.date);
+          return runDate >= periodStart && runDate < periodEnd;
+        });
+
+        return {
+          period: format(periodStart, 'MMM d'),
+          totalMiles: calculateTotalDistance(periodRuns),
+          avgPace: calculateAveragePace(periodRuns),
+          runCount: periodRuns.length
+        };
+      }).reverse();
+    } else {
+      return Array.from({ length: 6 }, (_, i) => {
+        const periodStart = startOfMonth(subMonths(new Date(), i));
+        const periodEnd = startOfMonth(subMonths(new Date(), i - 1));
+        
+        const periodRuns = runs.filter(run => {
+          const runDate = new Date(run.date);
+          return runDate >= periodStart && runDate < periodEnd;
+        });
+
+        return {
+          period: format(periodStart, 'MMM yyyy'),
+          totalMiles: calculateTotalDistance(periodRuns),
+          avgPace: calculateAveragePace(periodRuns),
+          runCount: periodRuns.length
+        };
+      }).reverse();
+    }
+  };
+
+  const data = generateStats();
   
   const timeRangeOptions = [
     { value: 'weekly', label: 'Weekly' },

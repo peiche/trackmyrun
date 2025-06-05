@@ -1,7 +1,9 @@
 import React from 'react';
 import Card from '../common/Card';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { weeklyStats } from '../../data/mockData';
+import { useAppContext } from '../../context/AppContext';
+import { startOfWeek, format, subWeeks } from 'date-fns';
+import { calculateTotalDistance } from '../../utils/calculations';
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -18,6 +20,25 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 const WeeklyMileageChart: React.FC = () => {
+  const { runs } = useAppContext();
+
+  // Generate weekly stats from actual run data
+  const weeklyStats = Array.from({ length: 12 }, (_, i) => {
+    const weekStart = startOfWeek(subWeeks(new Date(), i));
+    const weekEnd = startOfWeek(subWeeks(new Date(), i - 1));
+    
+    const weekRuns = runs.filter(run => {
+      const runDate = new Date(run.date);
+      return runDate >= weekStart && runDate < weekEnd;
+    });
+
+    return {
+      week: format(weekStart, 'MMM d'),
+      totalMiles: calculateTotalDistance(weekRuns),
+      runCount: weekRuns.length
+    };
+  }).reverse();
+
   return (
     <Card className="mb-6">
       <h2 className="text-lg font-semibold mb-4">Weekly Mileage</h2>
