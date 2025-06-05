@@ -54,64 +54,64 @@ const RunsList: React.FC = () => {
           
           {filteredRuns.length > 0 ? (
             <div className="overflow-x-auto -mx-5">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Date
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Distance
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Duration
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Pace
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Feeling
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Route
                     </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
                   {filteredRuns.map((run) => (
-                    <tr key={run.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={run.id} className="hover:bg-gray-50 dark:bg-gray-800 transition-colors">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                         {formatDate(run.date)}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                         {run.distance} mi
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                         {formatDuration(run.duration)}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                         {formatPace(run.pace)} /mi
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                         {getFeelingEmoji(run.feeling_rating)}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 max-w-[150px] truncate">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 max-w-[150px] truncate">
                         {run.route || '—'}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 text-right">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 text-right">
                         <div className="flex justify-end space-x-2">
                           <button
                             onClick={() => setEditingRun(run)}
-                            className="text-blue-600 hover:text-blue-800"
+                            className="text-blue-600 dark:text-blue-400 hover:text-blue-800"
                           >
                             <Edit size={16} />
                           </button>
                           <button
                             onClick={() => deleteRun(run.id)}
-                            className="text-red-600 hover:text-red-800"
+                            className="text-red-600 dark:text-red-400 hover:text-red-800"
                           >
                             <Trash2 size={16} />
                           </button>

@@ -20,6 +20,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ onClose, initialData }) => {
   const defaultTargetDate = format(addMonths(new Date(), 3), 'yyyy-MM-dd');
   
   const [formData, setFormData] = useState<Omit<Goal, 'id'>>({
+    user_id: initialData?.user_id || '',
     name: initialData?.name || '',
     target_date: initialData?.target_date || defaultTargetDate,
     target_distance: initialData?.target_distance || undefined,
@@ -122,28 +123,29 @@ const GoalForm: React.FC<GoalFormProps> = ({ onClose, initialData }) => {
           error={errors.name}
           placeholder="e.g., Complete a 10K race"
           fullWidth
+          autoComplete="off"
         />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             label="Target Date"
             type="date"
-            name="targetDate"
+            name="target_date"
             value={formData.target_date}
             onChange={handleChange}
-            error={errors.targetDate}
+            error={errors.target_date}
             fullWidth
           />
           
           <Input
             label="Target Distance (miles)"
             type="number"
-            name="targetDistance"
+            name="target_distance"
             min="0"
             step="0.1"
             value={formData.target_distance === undefined ? '' : formData.target_distance}
             onChange={handleNumberChange}
-            error={errors.targetDistance}
+            error={errors.target_distance}
             placeholder="Optional"
             fullWidth
           />
@@ -151,12 +153,12 @@ const GoalForm: React.FC<GoalFormProps> = ({ onClose, initialData }) => {
           <Input
             label="Target Pace (min/mile)"
             type="number"
-            name="targetPace"
+            name="target_pace"
             min="0"
             step="0.1"
             value={formData.target_pace === undefined ? '' : formData.target_pace}
             onChange={handleNumberChange}
-            error={errors.targetPace}
+            error={errors.target_pace}
             placeholder="Optional"
             fullWidth
           />

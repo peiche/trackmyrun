@@ -19,6 +19,7 @@ const RunForm: React.FC<RunFormProps> = ({ onClose, initialData }) => {
   const isEditing = !!initialData;
   
   const [formData, setFormData] = useState<Omit<Run, 'id' | 'pace'>>({
+    user_id: initialData?.user_id || '',
     date: initialData?.date || format(new Date(), 'yyyy-MM-dd'),
     distance: initialData?.distance || 0,
     duration: initialData?.duration || 0,
@@ -156,10 +157,10 @@ const RunForm: React.FC<RunFormProps> = ({ onClose, initialData }) => {
           
           <Select
             label="How did you feel?"
-            name="feelingRating"
+            name="feeling_rating"
             options={feelingOptions}
             value={formData.feeling_rating.toString()}
-            onChange={handleSelectChange('feelingRating')}
+            onChange={handleSelectChange('feeling_rating')}
             fullWidth
           />
         </div>
@@ -171,6 +172,7 @@ const RunForm: React.FC<RunFormProps> = ({ onClose, initialData }) => {
           onChange={handleChange}
           placeholder="Where did you run?"
           fullWidth
+          autoComplete="off"
         />
         
         <div className="mb-4">

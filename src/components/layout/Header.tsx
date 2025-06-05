@@ -99,7 +99,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
                   `}
                 >
                   <span className="mr-2">{item.icon}</span>
-                  <span>{item.label}</span>
+                  <span className="hidden sm:inline">{item.label}</span>
                 </button>
               ))}
             </nav>

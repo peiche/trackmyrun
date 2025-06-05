@@ -21,7 +21,7 @@ const GoalsList: React.FC = () => {
   const getGoalProgress = (goal: Goal): React.ReactNode => {
     if (goal.completed) {
       return (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-900 text-green-800 dark:text-green-200">
           <CheckCircle size={12} className="mr-1" /> Completed
         </span>
       );
@@ -41,7 +41,7 @@ const GoalsList: React.FC = () => {
     }
     
     return (
-      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-900 text-blue-800 dark:text-blue-200">
         {diffDays} days left
       </span>
     );
@@ -70,12 +70,12 @@ const GoalsList: React.FC = () => {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between">
                   <div>
                     <div className="flex items-center">
-                      <h3 className="text-lg font-medium text-gray-900 mr-3">
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mr-3">
                         {goal.name}
                       </h3>
                       {getGoalProgress(goal)}
                     </div>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       Target date: {formatDate(goal.target_date)}
                     </p>
                   </div>
@@ -85,20 +85,20 @@ const GoalsList: React.FC = () => {
                       onClick={() => toggleGoalCompletion(goal.id)}
                       className={`
                         mr-2 p-1.5 rounded-md
-                        ${goal.completed ? 'text-green-600 hover:bg-green-50' : 'text-blue-600 hover:bg-blue-50'}
+                        ${goal.completed ? 'text-green-600 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-900' : 'text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-900'}
                       `}
                     >
                       <CheckCircle size={18} />
                     </button>
                     <button
                       onClick={() => setEditingGoal(goal)}
-                      className="mr-2 text-blue-600 hover:text-blue-800 p-1.5 rounded-md hover:bg-blue-50"
+                      className="mr-2 p-1.5 rounded-md text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-900"
                     >
                       <Edit size={18} />
                     </button>
                     <button
                       onClick={() => deleteGoal(goal.id)}
-                      className="text-red-600 hover:text-red-800 p-1.5 rounded-md hover:bg-red-50"
+                      className="p-1.5 rounded-md text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-900"
                     >
                       <Trash2 size={18} />
                     </button>
@@ -107,14 +107,14 @@ const GoalsList: React.FC = () => {
                 
                 <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {goal.target_distance && (
-                    <div className="bg-gray-50 rounded-md p-3">
+                    <div className="bg-gray-50 dark:bg-gray-900 rounded-md p-3">
                       <span className="text-xs text-gray-500 block">Target Distance:</span>
                       <span className="font-medium">{goal.target_distance} miles</span>
                     </div>
                   )}
                   
                   {goal.target_pace && (
-                    <div className="bg-gray-50 rounded-md p-3">
+                    <div className="bg-gray-50 dark:bg-gray-900 rounded-md p-3">
                       <span className="text-xs text-gray-500 block">Target Pace:</span>
                       <span className="font-medium">{formatPace(goal.target_pace)} per mile</span>
                     </div>
@@ -122,7 +122,7 @@ const GoalsList: React.FC = () => {
                 </div>
                 
                 {goal.description && (
-                  <div className="mt-4 text-sm text-gray-600">
+                  <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
                     <p>{goal.description}</p>
                   </div>
                 )}

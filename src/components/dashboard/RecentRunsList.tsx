@@ -45,23 +45,23 @@ const RecentRunsList: React.FC = () => {
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {recentRuns.length > 0 ? (
               recentRuns.map((run) => (
-                <tr key={run.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={run.id} className="hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
                   <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                     {formatDate(run.date)}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                     {run.distance} mi
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                     {formatDuration(run.duration)}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                     {formatPace(run.pace)} /mi
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                     {getFeelingEmoji(run.feeling_rating)}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                     {run.route || '—'}
                   </td>
                 </tr>
