@@ -9,7 +9,7 @@ import RunForm from './components/runs/RunForm';
 import ProgressCharts from './components/progress/ProgressCharts';
 import GoalsList from './components/goals/GoalsList';
 import GoalForm from './components/goals/GoalForm';
-import FileImport from './components/import/FileImport';
+import ImportHub from './components/import/ImportHub';
 import Button from './components/common/Button';
 import { AppProvider } from './context/AppContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -74,7 +74,7 @@ function App() {
     }
 
     if (showImport) {
-      return <FileImport onClose={() => setShowImport(false)} />;
+      return <ImportHub onClose={() => setShowImport(false)} />;
     }
 
     switch (activeTab) {
@@ -129,7 +129,7 @@ function App() {
 
     if (showImport) {
       return {
-        title: 'Import Garmin Data',
+        title: 'Import Running Data',
         action: null
       };
     }
