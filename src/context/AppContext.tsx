@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Run, Goal } from '../types';
 import { supabase } from '../lib/supabase';
+import { checkAllGoalsForCompletion } from '../utils/goalCompletion';
 
 interface AppContextType {
   runs: Run[];
@@ -12,6 +13,7 @@ interface AppContextType {
   updateGoal: (id: string, goal: Partial<Omit<Goal, 'id' | 'user_id'>>) => Promise<void>;
   deleteGoal: (id: string) => Promise<void>;
   toggleGoalCompletion: (id: string) => Promise<void>;
+  checkGoalCompletions: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -35,6 +37,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children, currentUserI
       setGoals([]);
     }
   }, [currentUserId]);
+
+  // Check for goal completions whenever runs or goals change
+  useEffect(() => {
+    if (currentUserId && runs.length > 0 && goals.length > 0) {
+      checkGoalCompletions();
+    }
+  }, [runs.length, goals.length, currentUserId]);
 
   // Fetch runs from Supabase
   const fetchRuns = async () => {
@@ -70,6 +79,38 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children, currentUserI
     }
 
     setGoals(goalsData || []);
+  };
+
+  // Check for automatic goal completions
+  const checkGoalCompletions = async () => {
+    if (!currentUserId || goals.length === 0 || runs.length === 0) return;
+
+    const goalsToUpdate = checkAllGoalsForCompletion(goals, runs);
+    
+    if (goalsToUpdate.length > 0) {
+      console.log(`Auto-completing ${goalsToUpdate.length} goals`);
+      
+      // Update goals in database
+      for (const goal of goalsToUpdate) {
+        const { error } = await supabase
+          .from('goals')
+          .update({ completed: true })
+          .eq('id', goal.id)
+          .eq('user_id', currentUserId);
+
+        if (error) {
+          console.error('Error auto-completing goal:', error);
+        }
+      }
+
+      // Update local state
+      setGoals(prev => 
+        prev.map(goal => {
+          const updatedGoal = goalsToUpdate.find(g => g.id === goal.id);
+          return updatedGoal ? { ...goal, completed: true } : goal;
+        })
+      );
+    }
   };
 
   // Run functions
@@ -213,7 +254,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children, currentUserI
         addGoal,
         updateGoal,
         deleteGoal,
-        toggleGoalCompletion
+        toggleGoalCompletion,
+        checkGoalCompletions
       }}
     >
       {children}
