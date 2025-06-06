@@ -300,7 +300,7 @@ const GarminConnect: React.FC<GarminConnectProps> = ({ onClose }) => {
           <Button
             onClick={connectToGarmin}
             disabled={isLoading}
-            icon={isLoading ? <RefreshCw className="animate-spin" size={16} /> : <ExternalLink size={16} />}
+            icon={isLoading ? <RefreshCw className="animate-spin\" size={16} /> : <ExternalLink size={16} />}
           >
             {isLoading ? 'Connecting...' : 'Connect to Garmin Connect'}
           </Button>
@@ -330,7 +330,7 @@ const GarminConnect: React.FC<GarminConnectProps> = ({ onClose }) => {
                 size="sm"
                 onClick={loadRecentActivities}
                 disabled={isSyncing}
-                icon={isSyncing ? <RefreshCw className="animate-spin" size={16} /> : <RefreshCw size={16} />}
+                icon={isSyncing ? <RefreshCw className="animate-spin\" size={16} /> : <RefreshCw size={16} />}
               >
                 Refresh
               </Button>
@@ -357,7 +357,7 @@ const GarminConnect: React.FC<GarminConnectProps> = ({ onClose }) => {
                     onClick={importSelectedActivities}
                     disabled={selectedActivities.size === 0 || isSyncing}
                     size="sm"
-                    icon={isSyncing ? <RefreshCw className="animate-spin" size={16} /> : undefined}
+                    icon={isSyncing ? <RefreshCw className="animate-spin\" size={16} /> : undefined}
                   >
                     {isSyncing ? 'Importing...' : `Import Selected (${selectedActivities.size})`}
                   </Button>
