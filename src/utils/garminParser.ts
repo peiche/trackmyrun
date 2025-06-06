@@ -28,8 +28,13 @@ const parseTCX = (content: string): ParsedRunData | null => {
       throw new Error('No activity found in TCX file');
     }
 
-    // Get activity date
-    const startTime = activity.getAttribute('Id');
+    // Get activity date - try both attribute and element approaches
+    let startTime = activity.getAttribute('Id');
+    if (!startTime) {
+      const idElement = activity.querySelector('Id');
+      startTime = idElement?.textContent || null;
+    }
+    
     if (!startTime) {
       throw new Error('No start time found');
     }
