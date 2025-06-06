@@ -55,11 +55,11 @@ const FileImport: React.FC<FileImportProps> = ({ onClose }) => {
       try {
         const fileExtension = file.name.split('.').pop()?.toLowerCase();
         
-        if (!['tcx', 'gpx', 'fit'].includes(fileExtension || '')) {
+        if (!['tcx', 'gpx'].includes(fileExtension || '')) {
           newResults.push({
             success: false,
             fileName: file.name,
-            message: 'Unsupported file format. Please use TCX, GPX, or FIT files.'
+            message: 'Unsupported file format. Please use TCX or GPX files.'
           });
           continue;
         }
@@ -121,7 +121,7 @@ const FileImport: React.FC<FileImportProps> = ({ onClose }) => {
 
       <div className="mb-6">
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          Import your runs from Garmin Connect by uploading TCX, GPX, or FIT files. 
+          Import your runs from Garmin Connect by uploading TCX or GPX files. 
           You can export these files from your Garmin Connect account.
         </p>
         
@@ -154,7 +154,7 @@ const FileImport: React.FC<FileImportProps> = ({ onClose }) => {
           {isProcessing ? 'Processing files...' : 'Drop files here or click to browse'}
         </h3>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          Supports TCX, GPX, and FIT files from Garmin devices
+          Supports TCX and GPX files from Garmin devices
         </p>
         
         <Button
@@ -170,7 +170,7 @@ const FileImport: React.FC<FileImportProps> = ({ onClose }) => {
           ref={fileInputRef}
           type="file"
           multiple
-          accept=".tcx,.gpx,.fit"
+          accept=".tcx,.gpx"
           onChange={handleFileSelect}
           className="hidden"
         />

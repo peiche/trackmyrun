@@ -180,14 +180,6 @@ const toRadians = (degrees: number): number => {
   return degrees * (Math.PI / 180);
 };
 
-// Parse FIT files (simplified - FIT files are binary and complex)
-const parseFIT = (content: string): ParsedRunData | null => {
-  // FIT files are binary format and require specialized parsing
-  // For now, we'll return null and suggest using TCX/GPX export instead
-  console.warn('FIT file parsing not yet implemented. Please export as TCX or GPX from Garmin Connect.');
-  return null;
-};
-
 // Main parser function
 export const parseGarminFile = async (content: string, fileType: string): Promise<ParsedRunData | null> => {
   switch (fileType.toLowerCase()) {
@@ -195,15 +187,13 @@ export const parseGarminFile = async (content: string, fileType: string): Promis
       return parseTCX(content);
     case 'gpx':
       return parseGPX(content);
-    case 'fit':
-      return parseFIT(content);
     default:
       throw new Error(`Unsupported file type: ${fileType}`);
   }
 };
 
 // Utility function to detect file type from content
-export const detectFileType = (content: string): string | null => {
+export const detectFileType = (content: string) => {
   const trimmedContent = content.trim();
   
   if (trimmedContent.includes('<TrainingCenterDatabase') || trimmedContent.includes('<tcx:')) {
@@ -213,7 +203,4 @@ export const detectFileType = (content: string): string | null => {
   if (trimmedContent.includes('<gpx') || trimmedContent.includes('<?xml') && trimmedContent.includes('<trk')) {
     return 'gpx';
   }
-  
-  // FIT files are binary, so string content won't match
-  return null;
 };
