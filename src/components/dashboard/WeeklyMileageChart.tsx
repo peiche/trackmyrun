@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recha
 import { useAppContext } from '../../context/AppContext';
 import { startOfWeek, format, subWeeks } from 'date-fns';
 import { calculateTotalDistance } from '../../utils/calculations';
+import { useTheme } from '../../context/ThemeContext';
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -21,12 +22,13 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 const WeeklyMileageChart: React.FC = () => {
   const { runs } = useAppContext();
+  const { isDark } = useTheme();
 
   // Generate weekly stats from actual run data
   const weeklyStats = Array.from({ length: 12 }, (_, i) => {
     const weekStart = startOfWeek(subWeeks(new Date(), i));
     const weekEnd = startOfWeek(subWeeks(new Date(), i - 1));
-    
+
     const weekRuns = runs.filter(run => {
       const runDate = new Date(run.date);
       return runDate >= weekStart && runDate < weekEnd;
@@ -39,6 +41,8 @@ const WeeklyMileageChart: React.FC = () => {
     };
   }).reverse();
 
+  const cursorFillColor = isDark ? 'rgb(55 65 81)' : 'rgb(204, 204, 204)';
+
   return (
     <Card className="mb-6">
       <h2 className="text-lg font-semibold mb-4">Weekly Mileage</h2>
@@ -48,15 +52,15 @@ const WeeklyMileageChart: React.FC = () => {
             data={weeklyStats}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <XAxis 
-              dataKey="week" 
+            <XAxis
+              dataKey="week"
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 12 }}
               className="text-gray-500 dark:text-gray-400"
               style={{ fill: 'currentcolor' }}
             />
-            <YAxis 
+            <YAxis
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 12 }}
@@ -64,10 +68,13 @@ const WeeklyMileageChart: React.FC = () => {
               className="text-gray-500 dark:text-gray-400"
               style={{ fill: 'currentcolor' }}
             />
-            <Tooltip content={<CustomTooltip />} />
-            <Bar 
-              dataKey="totalMiles" 
-              fill="#3B82F6" 
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ fill: cursorFillColor }}
+            />
+            <Bar
+              dataKey="totalMiles"
+              fill="#3B82F6"
               radius={[4, 4, 0, 0]}
               animationDuration={1500}
             />

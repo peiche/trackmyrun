@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Header from './components/layout/Header';
 import PageContainer from './components/layout/PageContainer';
 import DashboardStats from './components/dashboard/DashboardStats';
