@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, FileText, AlertCircle, CheckCircle, X, ArrowLeft } from 'lucide-react';
+import { Upload, FileText, AlertCircle, CheckCircle, X } from 'lucide-react';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import { useAppContext } from '../../context/AppContext';
@@ -7,7 +7,6 @@ import { parseGarminFile } from '../../utils/garminParser';
 
 interface FileImportProps {
   onClose: () => void;
-  onBack?: () => void;
 }
 
 interface ImportResult {
@@ -17,7 +16,7 @@ interface ImportResult {
   runData?: any;
 }
 
-const FileImport: React.FC<FileImportProps> = ({ onClose, onBack }) => {
+const FileImport: React.FC<FileImportProps> = ({ onClose }) => {
   const { addRun } = useAppContext();
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -111,17 +110,7 @@ const FileImport: React.FC<FileImportProps> = ({ onClose, onBack }) => {
   return (
     <Card className="max-w-2xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center">
-          {onBack && (
-            <button 
-              onClick={onBack}
-              className="mr-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              <ArrowLeft size={20} />
-            </button>
-          )}
-          <h2 className="text-xl font-semibold">Upload Garmin Files</h2>
-        </div>
+        <h2 className="text-xl font-semibold">Upload Running Files</h2>
         <button 
           onClick={onClose}
           className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
@@ -132,8 +121,7 @@ const FileImport: React.FC<FileImportProps> = ({ onClose, onBack }) => {
 
       <div className="mb-6">
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          Upload your runs from Garmin Connect by uploading TCX or GPX files. 
-          You can export these files from your Garmin Connect account.
+          Upload your runs by uploading TCX or GPX files from Garmin Connect, Strava, or other fitness platforms.
         </p>
         
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4">
@@ -165,7 +153,7 @@ const FileImport: React.FC<FileImportProps> = ({ onClose, onBack }) => {
           {isProcessing ? 'Processing files...' : 'Drop files here or click to browse'}
         </h3>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          Supports TCX and GPX files from Garmin devices
+          Supports TCX and GPX files from Garmin, Strava, and other fitness platforms
         </p>
         
         <Button
