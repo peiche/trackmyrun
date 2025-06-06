@@ -40,7 +40,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Run className="h-8 w-8 text-gray-900 dark:text-white" />
-              <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white hidden sm:inline">RunTracker</span>
+              <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white hidden sm:inline">TrackMyRun</span>
             </div>
 
             <div className="flex items-center space-x-4">
