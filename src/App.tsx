@@ -9,16 +9,18 @@ import RunForm from './components/runs/RunForm';
 import ProgressCharts from './components/progress/ProgressCharts';
 import GoalsList from './components/goals/GoalsList';
 import GoalForm from './components/goals/GoalForm';
+import FileImport from './components/import/FileImport';
 import Button from './components/common/Button';
 import { AppProvider } from './context/AppContext';
 import { ThemeProvider } from './context/ThemeContext';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Upload } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showRunForm, setShowRunForm] = useState(false);
   const [showGoalForm, setShowGoalForm] = useState(false);
+  const [showImport, setShowImport] = useState(false);
   const [user, setUser] = useState<any>(null);
   
   useEffect(() => {
@@ -71,6 +73,10 @@ function App() {
       );
     }
 
+    if (showImport) {
+      return <FileImport onClose={() => setShowImport(false)} />;
+    }
+
     switch (activeTab) {
       case 'dashboard':
         return (
@@ -121,20 +127,36 @@ function App() {
       };
     }
 
+    if (showImport) {
+      return {
+        title: 'Import Garmin Data',
+        action: null
+      };
+    }
+
     switch (activeTab) {
       case 'dashboard':
         return {
           title: 'Dashboard',
           action: (
-            <Button 
-              icon={<PlusCircle size={16} />}
-              onClick={() => {
-                setActiveTab('runs');
-                setShowRunForm(true);
-              }}
-            >
-              Log Run
-            </Button>
+            <div className="flex space-x-2">
+              <Button 
+                variant="outline"
+                icon={<Upload size={16} />}
+                onClick={() => setShowImport(true)}
+              >
+                Import
+              </Button>
+              <Button 
+                icon={<PlusCircle size={16} />}
+                onClick={() => {
+                  setActiveTab('runs');
+                  setShowRunForm(true);
+                }}
+              >
+                Log Run
+              </Button>
+            </div>
           )
         };
       
@@ -142,12 +164,21 @@ function App() {
         return {
           title: 'My Runs',
           action: !showRunForm && (
-            <Button 
-              icon={<PlusCircle size={16} />}
-              onClick={() => setShowRunForm(true)}
-            >
-              Log Run
-            </Button>
+            <div className="flex space-x-2">
+              <Button 
+                variant="outline"
+                icon={<Upload size={16} />}
+                onClick={() => setShowImport(true)}
+              >
+                Import
+              </Button>
+              <Button 
+                icon={<PlusCircle size={16} />}
+                onClick={() => setShowRunForm(true)}
+              >
+                Log Run
+              </Button>
+            </div>
           )
         };
       
@@ -183,7 +214,12 @@ function App() {
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
           <Header 
             activeTab={activeTab} 
-            onTabChange={setActiveTab}
+            onTabChange={(tab) => {
+              setActiveTab(tab);
+              setShowImport(false);
+              setShowRunForm(false);
+              setShowGoalForm(false);
+            }}
             user={user}
           />
           
