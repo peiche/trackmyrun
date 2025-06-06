@@ -8,10 +8,10 @@ import { calculateTotalDistance } from '../../utils/calculations';
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-3 shadow-md rounded-md border border-gray-200">
+      <div className="bg-white dark:bg-gray-900 p-3 shadow-md rounded-md border border-gray-200 dark:border-gray-900">
         <p className="font-medium">{`Week of ${label}`}</p>
-        <p className="text-blue-600">{`Total: ${payload[0].value} miles`}</p>
-        <p className="text-xs text-gray-500">{`${payload[0].payload.runCount} runs`}</p>
+        <p className="text-blue-600 dark:text-blue-400">{`Total: ${payload[0].value} miles`}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{`${payload[0].payload.runCount} run${payload[0].payload.runCount !== 1 ? 's' : ''}`}</p>
       </div>
     );
   }
@@ -53,12 +53,16 @@ const WeeklyMileageChart: React.FC = () => {
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 12 }}
+              className="text-gray-500 dark:text-gray-400"
+              style={{ fill: 'currentcolor' }}
             />
             <YAxis 
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 12 }}
               tickFormatter={(value) => `${value} mi`}
+              className="text-gray-500 dark:text-gray-400"
+              style={{ fill: 'currentcolor' }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Bar 

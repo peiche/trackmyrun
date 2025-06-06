@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import Card from '../common/Card';
 import Select from '../common/Select';
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   AreaChart,
   Area
@@ -18,6 +18,19 @@ import { calculateTotalDistance, calculateAveragePace } from '../../utils/calcul
 import { formatPace } from '../../utils/calculations';
 
 const PaceChart: React.FC<{ data: any[] }> = ({ data }) => {
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white dark:bg-gray-900 p-3 shadow-md rounded-md border border-gray-200 dark:border-gray-900">
+          <p className="font-medium">{label}</p>
+          <p className="text-blue-600 dark:text-blue-400">Avg Pace: {formatPace(payload[0].payload.avgPace)}</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <Card className="mb-6">
       <h2 className="text-lg font-semibold mb-4">Pace Trends</h2>
@@ -27,27 +40,28 @@ const PaceChart: React.FC<{ data: any[] }> = ({ data }) => {
             data={data}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis 
+            <CartesianGrid strokeDasharray="3 3" className="text-gray-100 dark:text-gray-800" stroke="currentColor" />
+            <XAxis
               dataKey="period"
               axisLine={false}
               tickLine={false}
+              className="text-gray-500 dark:text-gray-400"
+              style={{ fill: 'currentcolor' }}
             />
-            <YAxis 
+            <YAxis
               axisLine={false}
               tickLine={false}
               tickFormatter={(value) => formatPace(value)}
               domain={['dataMin - 1', 'dataMax + 1']}
               allowDecimals={false}
+              className="text-gray-500 dark:text-gray-400"
+              style={{ fill: 'currentcolor' }}
             />
-            <Tooltip 
-              formatter={(value: number) => [formatPace(value), 'Avg Pace']}
-              labelFormatter={(label) => label}
-            />
-            <Line 
-              type="monotone" 
-              dataKey="avgPace" 
-              stroke="#14B8A6" 
+            <Tooltip content={<CustomTooltip />} />
+            <Line
+              type="monotone"
+              dataKey="avgPace"
+              stroke="#14B8A6"
               strokeWidth={2}
               dot={{ r: 4 }}
               activeDot={{ r: 6, stroke: '#14B8A6', strokeWidth: 2 }}
@@ -61,6 +75,19 @@ const PaceChart: React.FC<{ data: any[] }> = ({ data }) => {
 };
 
 const MileageChart: React.FC<{ data: any[] }> = ({ data }) => {
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white dark:bg-gray-900 p-3 shadow-md rounded-md border border-gray-200 dark:border-gray-900">
+          <p className="font-medium">{label}</p>
+          <p className="text-blue-600 dark:text-blue-400">Total Distance: {payload[0].payload.totalMiles.toFixed(1)} miles</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <Card className="mb-6">
       <h2 className="text-lg font-semibold mb-4">Mileage Progress</h2>
@@ -70,26 +97,27 @@ const MileageChart: React.FC<{ data: any[] }> = ({ data }) => {
             data={data}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis 
+            <CartesianGrid strokeDasharray="3 3" className="text-gray-100 dark:text-gray-800" stroke="currentColor" />
+            <XAxis
               dataKey="period"
               axisLine={false}
               tickLine={false}
+              className="text-gray-500 dark:text-gray-400"
+              style={{ fill: 'currentcolor' }}
             />
-            <YAxis 
+            <YAxis
               axisLine={false}
               tickLine={false}
               tickFormatter={(value) => `${value} mi`}
+              className="text-gray-500 dark:text-gray-400"
+              style={{ fill: 'currentcolor' }}
             />
-            <Tooltip 
-              formatter={(value: number) => [`${value.toFixed(1)} miles`, 'Total Distance']}
-              labelFormatter={(label) => label}
-            />
-            <Area 
-              type="monotone" 
-              dataKey="totalMiles" 
-              stroke="#3B82F6" 
-              fill="url(#colorMiles)" 
+            <Tooltip content={<CustomTooltip />} />
+            <Area
+              type="monotone"
+              dataKey="totalMiles"
+              stroke="#3B82F6"
+              fill="url(#colorMiles)"
               strokeWidth={2}
               activeDot={{ r: 6, stroke: '#3B82F6', strokeWidth: 2 }}
               animationDuration={1500}
@@ -108,6 +136,19 @@ const MileageChart: React.FC<{ data: any[] }> = ({ data }) => {
 };
 
 const RunCountChart: React.FC<{ data: any[] }> = ({ data }) => {
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white dark:bg-gray-900 p-3 shadow-md rounded-md border border-gray-200 dark:border-gray-900">
+          <p className="font-medium">{label}</p>
+          <p className="text-blue-600 dark:text-blue-400">Run Count: {payload[0].payload.runCount} run{payload[0].payload.runCount !== 1 ? 's' : ''}</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <Card className="mb-6">
       <h2 className="text-lg font-semibold mb-4">Run Frequency</h2>
@@ -117,28 +158,29 @@ const RunCountChart: React.FC<{ data: any[] }> = ({ data }) => {
             data={data}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis 
+            <CartesianGrid strokeDasharray="3 3" className="text-gray-100 dark:text-gray-800" stroke="currentColor" />
+            <XAxis
               dataKey="period"
               axisLine={false}
               tickLine={false}
+              className="text-gray-500 dark:text-gray-400"
+              style={{ fill: 'currentcolor' }}
             />
-            <YAxis 
+            <YAxis
               axisLine={false}
               tickLine={false}
               domain={[0, 'dataMax + 1']}
               allowDecimals={false}
               tickFormatter={(value) => `${value} runs`}
+              className="text-gray-500 dark:text-gray-400"
+              style={{ fill: 'currentcolor' }}
             />
-            <Tooltip 
-              formatter={(value: number) => [`${value} runs`, 'Run Count']}
-              labelFormatter={(label) => label}
-            />
-            <Area 
-              type="monotone" 
-              dataKey="runCount" 
-              stroke="#F97316" 
-              fill="url(#colorRuns)" 
+            <Tooltip content={<CustomTooltip />} />
+            <Area
+              type="monotone"
+              dataKey="runCount"
+              stroke="#F97316"
+              fill="url(#colorRuns)"
               strokeWidth={2}
               activeDot={{ r: 6, stroke: '#F97316', strokeWidth: 2 }}
               animationDuration={1500}
@@ -159,14 +201,14 @@ const RunCountChart: React.FC<{ data: any[] }> = ({ data }) => {
 const ProgressCharts: React.FC = () => {
   const [timeRange, setTimeRange] = useState<'weekly' | 'monthly'>('weekly');
   const { runs } = useAppContext();
-  
+
   // Generate stats based on actual run data
   const generateStats = () => {
     if (timeRange === 'weekly') {
       return Array.from({ length: 12 }, (_, i) => {
         const periodStart = startOfWeek(subWeeks(new Date(), i));
         const periodEnd = startOfWeek(subWeeks(new Date(), i - 1));
-        
+
         const periodRuns = runs.filter(run => {
           const runDate = new Date(run.date);
           return runDate >= periodStart && runDate < periodEnd;
@@ -183,7 +225,7 @@ const ProgressCharts: React.FC = () => {
       return Array.from({ length: 6 }, (_, i) => {
         const periodStart = startOfMonth(subMonths(new Date(), i));
         const periodEnd = startOfMonth(subMonths(new Date(), i - 1));
-        
+
         const periodRuns = runs.filter(run => {
           const runDate = new Date(run.date);
           return runDate >= periodStart && runDate < periodEnd;
@@ -200,12 +242,12 @@ const ProgressCharts: React.FC = () => {
   };
 
   const data = generateStats();
-  
+
   const timeRangeOptions = [
     { value: 'weekly', label: 'Weekly' },
     { value: 'monthly', label: 'Monthly' },
   ];
-  
+
   return (
     <div>
       <div className="flex justify-end mb-4">
@@ -216,12 +258,12 @@ const ProgressCharts: React.FC = () => {
           className="w-40"
         />
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <MileageChart data={data} />
         <PaceChart data={data} />
       </div>
-      
+
       <RunCountChart data={data} />
     </div>
   );
