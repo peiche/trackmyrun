@@ -29,7 +29,7 @@ const GoalsList: React.FC = () => {
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
             <Award size={12} className="mr-1" /> Completed
           </span>
-          <p className="text-xs text-gray-600 dark:text-gray-400">{progress.message}</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400 flex gap-1" dangerouslySetInnerHTML={{ __html: progress.message }}/>
         </div>
       );
     }
@@ -66,7 +66,7 @@ const GoalsList: React.FC = () => {
       statusIcon = <CheckCircle size={12} className="mr-1" />;
     }
     
-    const colorClasses = {
+    const colorClasses: any = {
       blue: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200',
       green: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200',
       orange: 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200',
@@ -100,7 +100,7 @@ const GoalsList: React.FC = () => {
           </div>
         )}
         
-        <p className="text-xs text-gray-600 dark:text-gray-400">{progress.message}</p>
+        <p className="text-xs text-gray-600 dark:text-gray-400 flex gap-1" dangerouslySetInnerHTML={{ __html: progress.message }} />
       </div>
     );
   };

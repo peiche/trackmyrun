@@ -58,14 +58,6 @@ const RunsList: React.FC = () => {
             />
             <Search className="absolute left-3 top-3.5 h-4 w-4 text-gray-400" />
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowImport(true)}
-            icon={<Upload size={16} />}
-          >
-            Import
-          </Button>
         </div>
       </div>
       

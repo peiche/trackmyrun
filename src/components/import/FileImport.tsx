@@ -140,7 +140,6 @@ const FileImport: React.FC<FileImportProps> = ({ onClose }) => {
     });
   };
 
-  const successCount = results.filter(r => r.success).length;
   const errorCount = results.filter(r => !r.success).length;
   const totalImportedRuns = results.reduce((sum, r) => sum + (r.runCount || (r.success ? 1 : 0)), 0);
 
