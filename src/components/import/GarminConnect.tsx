@@ -4,6 +4,7 @@ import Card from '../common/Card';
 import Button from '../common/Button';
 import { useAppContext } from '../../context/AppContext';
 import { supabase } from '../../lib/supabase';
+import { generateAuthUrl } from '../../lib/garminAuth';
 
 interface GarminConnectProps {
   onClose: () => void;
@@ -38,6 +39,29 @@ const GarminConnect: React.FC<GarminConnectProps> = ({ onClose }) => {
 
   useEffect(() => {
     checkGarminConnection();
+    
+    // Listen for OAuth callback messages
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      
+      if (event.data.type === 'GARMIN_AUTH_SUCCESS') {
+        setConnection({
+          connected: true,
+          username: event.data.data.profile.userName,
+          lastSync: new Date().toISOString(),
+          accessToken: event.data.data.tokens.access_token
+        });
+        setSuccess('Successfully connected to Garmin Connect!');
+        setIsLoading(false);
+        loadRecentActivities();
+      } else if (event.data.type === 'GARMIN_AUTH_ERROR') {
+        setError('Failed to connect to Garmin Connect: ' + event.data.error);
+        setIsLoading(false);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
   }, []);
 
   const checkGarminConnection = async () => {
@@ -61,7 +85,7 @@ const GarminConnect: React.FC<GarminConnectProps> = ({ onClose }) => {
         });
         
         // Load recent activities if connected
-        await loadRecentActivities(data.access_token);
+        await loadRecentActivities();
       }
     } catch (err) {
       console.error('Error checking Garmin connection:', err);
@@ -73,9 +97,8 @@ const GarminConnect: React.FC<GarminConnectProps> = ({ onClose }) => {
     setError(null);
 
     try {
-      // In a real implementation, this would redirect to Garmin's OAuth flow
-      // For demo purposes, we'll simulate the connection
-      const authUrl = `https://connect.garmin.com/oauthConfirm?oauth_callback=${encodeURIComponent(window.location.origin)}/garmin-callback`;
+      // Generate the OAuth URL
+      const authUrl = generateAuthUrl();
       
       // Open Garmin Connect OAuth in a popup
       const popup = window.open(
@@ -84,108 +107,56 @@ const GarminConnect: React.FC<GarminConnectProps> = ({ onClose }) => {
         'width=600,height=700,scrollbars=yes,resizable=yes'
       );
 
-      // Listen for the OAuth callback
+      // Check if popup was blocked
+      if (!popup) {
+        throw new Error('Popup was blocked. Please allow popups for this site and try again.');
+      }
+
+      // Monitor popup closure
       const checkClosed = setInterval(() => {
-        if (popup?.closed) {
+        if (popup.closed) {
           clearInterval(checkClosed);
-          // Simulate successful connection for demo
-          simulateGarminConnection();
+          if (!connection.connected) {
+            setError('Authorization was cancelled or failed.');
+            setIsLoading(false);
+          }
         }
       }, 1000);
 
     } catch (err) {
-      setError('Failed to connect to Garmin Connect. Please try again.');
+      setError(err instanceof Error ? err.message : 'Failed to connect to Garmin Connect. Please try again.');
       setIsLoading(false);
     }
   };
 
-  const simulateGarminConnection = async () => {
+  const loadRecentActivities = async () => {
+    setIsSyncing(true);
+    setError(null);
+    
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
 
-      // Simulate storing connection data
-      const connectionData = {
-        user_id: user.id,
-        garmin_username: 'demo_user@example.com',
-        access_token: 'demo_token_' + Date.now(),
-        refresh_token: 'demo_refresh_' + Date.now(),
-        last_sync: new Date().toISOString(),
-        created_at: new Date().toISOString()
-      };
-
-      // In a real app, this would be stored securely
-      setConnection({
-        connected: true,
-        username: connectionData.garmin_username,
-        lastSync: connectionData.last_sync,
-        accessToken: connectionData.access_token
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/garmin-activities?start=0&limit=20`, {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        }
       });
 
-      // Load demo activities
-      await loadDemoActivities();
-      setSuccess('Successfully connected to Garmin Connect!');
-      setIsLoading(false);
-    } catch (err) {
-      setError('Failed to save Garmin connection. Please try again.');
-      setIsLoading(false);
-    }
-  };
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to load activities');
+      }
 
-  const loadRecentActivities = async (accessToken: string) => {
-    setIsSyncing(true);
-    try {
-      // In a real implementation, this would call the Garmin Connect API
-      await loadDemoActivities();
+      const activitiesData = await response.json();
+      setActivities(activitiesData);
     } catch (err) {
-      setError('Failed to load activities from Garmin Connect.');
+      console.error('Error loading activities:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load activities from Garmin Connect.');
     } finally {
       setIsSyncing(false);
     }
-  };
-
-  const loadDemoActivities = async () => {
-    // Simulate loading activities from Garmin Connect
-    const demoActivities: GarminActivity[] = [
-      {
-        activityId: '1',
-        activityName: 'Morning Run',
-        startTimeLocal: '2024-01-15T07:00:00',
-        distance: 5.2,
-        duration: 32.5,
-        activityType: 'running',
-        imported: false
-      },
-      {
-        activityId: '2',
-        activityName: 'Evening Jog',
-        startTimeLocal: '2024-01-14T18:30:00',
-        distance: 3.1,
-        duration: 22.8,
-        activityType: 'running',
-        imported: false
-      },
-      {
-        activityId: '3',
-        activityName: 'Long Run',
-        startTimeLocal: '2024-01-13T08:15:00',
-        distance: 10.5,
-        duration: 68.2,
-        activityType: 'running',
-        imported: false
-      },
-      {
-        activityId: '4',
-        activityName: 'Recovery Run',
-        startTimeLocal: '2024-01-12T07:45:00',
-        distance: 4.0,
-        duration: 28.5,
-        activityType: 'running',
-        imported: false
-      }
-    ];
-
-    setActivities(demoActivities);
   };
 
   const toggleActivitySelection = (activityId: string) => {
@@ -213,8 +184,8 @@ const GarminConnect: React.FC<GarminConnectProps> = ({ onClose }) => {
 
         const runData = {
           date: new Date(activity.startTimeLocal).toISOString().split('T')[0],
-          distance: activity.distance,
-          duration: activity.duration,
+          distance: Math.round(activity.distance * 100) / 100,
+          duration: Math.round(activity.duration * 100) / 100,
           pace: activity.duration / activity.distance,
           route: activity.activityName,
           notes: `Imported from Garmin Connect - Activity Type: ${activity.activityType}`,
@@ -243,6 +214,15 @@ const GarminConnect: React.FC<GarminConnectProps> = ({ onClose }) => {
 
   const disconnectGarmin = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Delete the connection from the database
+      await supabase
+        .from('garmin_connections')
+        .delete()
+        .eq('user_id', user.id);
+
       setConnection({ connected: false });
       setActivities([]);
       setSelectedActivities(new Set());
@@ -311,16 +291,16 @@ const GarminConnect: React.FC<GarminConnectProps> = ({ onClose }) => {
             Your data will be imported securely and you can choose which activities to add.
           </p>
           
-          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md p-4 mb-6 max-w-md mx-auto">
-            <p className="text-sm text-amber-800 dark:text-amber-200">
-              <strong>Demo Mode:</strong> This will simulate a Garmin Connect connection with sample data for demonstration purposes.
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4 mb-6 max-w-md mx-auto">
+            <p className="text-sm text-blue-800 dark:text-blue-200">
+              <strong>Setup Required:</strong> You'll need to configure your Garmin Connect IQ app credentials in the environment variables.
             </p>
           </div>
 
           <Button
             onClick={connectToGarmin}
             disabled={isLoading}
-            icon={isLoading ? <RefreshCw className="animate-spin\" size={16} /> : <ExternalLink size={16} />}
+            icon={isLoading ? <RefreshCw className="animate-spin" size={16} /> : <ExternalLink size={16} />}
           >
             {isLoading ? 'Connecting...' : 'Connect to Garmin Connect'}
           </Button>
@@ -348,9 +328,9 @@ const GarminConnect: React.FC<GarminConnectProps> = ({ onClose }) => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => loadRecentActivities(connection.accessToken || '')}
+                onClick={loadRecentActivities}
                 disabled={isSyncing}
-                icon={isSyncing ? <RefreshCw className="animate-spin\" size={16} /> : <RefreshCw size={16} />}
+                icon={isSyncing ? <RefreshCw className="animate-spin" size={16} /> : <RefreshCw size={16} />}
               >
                 Refresh
               </Button>
@@ -377,7 +357,7 @@ const GarminConnect: React.FC<GarminConnectProps> = ({ onClose }) => {
                     onClick={importSelectedActivities}
                     disabled={selectedActivities.size === 0 || isSyncing}
                     size="sm"
-                    icon={isSyncing ? <RefreshCw className="animate-spin\" size={16} /> : undefined}
+                    icon={isSyncing ? <RefreshCw className="animate-spin" size={16} /> : undefined}
                   >
                     {isSyncing ? 'Importing...' : `Import Selected (${selectedActivities.size})`}
                   </Button>

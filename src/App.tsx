@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
 import PageContainer from './components/layout/PageContainer';
 import DashboardStats from './components/dashboard/DashboardStats';
@@ -10,13 +11,14 @@ import ProgressCharts from './components/progress/ProgressCharts';
 import GoalsList from './components/goals/GoalsList';
 import GoalForm from './components/goals/GoalForm';
 import ImportHub from './components/import/ImportHub';
+import GarminCallback from './components/auth/GarminCallback';
 import Button from './components/common/Button';
 import { AppProvider } from './context/AppContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { PlusCircle, Upload } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
-function App() {
+function MainApp() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showRunForm, setShowRunForm] = useState(false);
   const [showGoalForm, setShowGoalForm] = useState(false);
@@ -209,29 +211,44 @@ function App() {
   const tabConfig = getTabConfig();
   
   return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+      <Header 
+        activeTab={activeTab} 
+        onTabChange={(tab) => {
+          setActiveTab(tab);
+          setShowImport(false);
+          setShowRunForm(false);
+          setShowGoalForm(false);
+        }}
+        user={user}
+      />
+      
+      <main>
+        <PageContainer 
+          title={tabConfig.title}
+          action={tabConfig.action}
+        >
+          {renderTabContent()}
+        </PageContainer>
+      </main>
+    </div>
+  );
+}
+
+function App() {
+  return (
     <ThemeProvider>
-      <AppProvider currentUserId={user?.id || null}>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-          <Header 
-            activeTab={activeTab} 
-            onTabChange={(tab) => {
-              setActiveTab(tab);
-              setShowImport(false);
-              setShowRunForm(false);
-              setShowGoalForm(false);
-            }}
-            user={user}
-          />
-          
-          <main>
-            <PageContainer 
-              title={tabConfig.title}
-              action={tabConfig.action}
-            >
-              {renderTabContent()}
-            </PageContainer>
-          </main>
-        </div>
+      <AppProvider currentUserId={null}>
+        <Router>
+          <Routes>
+            <Route path="/auth/garmin/callback" element={<GarminCallback />} />
+            <Route path="/*" element={
+              <AppProvider currentUserId={null}>
+                <MainApp />
+              </AppProvider>
+            } />
+          </Routes>
+        </Router>
       </AppProvider>
     </ThemeProvider>
   );
