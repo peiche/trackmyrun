@@ -3,7 +3,7 @@ import { Upload, FileText, AlertCircle, CheckCircle, X } from 'lucide-react';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import { useAppContext } from '../../context/AppContext';
-import { parseGarminFile } from '../../utils/garminParser';
+import { parseGarminFile, parseCSVFile } from '../../utils/garminParser';
 
 interface FileImportProps {
   onClose: () => void;
@@ -14,6 +14,7 @@ interface ImportResult {
   fileName: string;
   message: string;
   runData?: any;
+  runCount?: number;
 }
 
 const FileImport: React.FC<FileImportProps> = ({ onClose }) => {
@@ -55,32 +56,67 @@ const FileImport: React.FC<FileImportProps> = ({ onClose }) => {
       try {
         const fileExtension = file.name.split('.').pop()?.toLowerCase();
         
-        if (!['tcx', 'gpx'].includes(fileExtension || '')) {
+        if (!['tcx', 'gpx', 'csv'].includes(fileExtension || '')) {
           newResults.push({
             success: false,
             fileName: file.name,
-            message: 'Unsupported file format. Please use TCX or GPX files.'
+            message: 'Unsupported file format. Please use TCX, GPX, or CSV files.'
           });
           continue;
         }
 
         const fileContent = await readFileContent(file);
-        const runData = await parseGarminFile(fileContent, fileExtension || '');
 
-        if (runData) {
-          await addRun(runData);
-          newResults.push({
-            success: true,
-            fileName: file.name,
-            message: `Successfully imported run: ${runData.distance} miles on ${runData.date}`,
-            runData
-          });
+        if (fileExtension === 'csv') {
+          // Handle CSV files (multiple runs)
+          const runs = await parseCSVFile(fileContent);
+          
+          if (runs && runs.length > 0) {
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (const runData of runs) {
+              try {
+                await addRun(runData);
+                successCount++;
+              } catch (error) {
+                errorCount++;
+                console.error('Error adding run:', error);
+              }
+            }
+
+            newResults.push({
+              success: successCount > 0,
+              fileName: file.name,
+              message: `Imported ${successCount} runs successfully${errorCount > 0 ? `, ${errorCount} failed` : ''}`,
+              runCount: successCount
+            });
+          } else {
+            newResults.push({
+              success: false,
+              fileName: file.name,
+              message: 'No valid run data found in CSV file.'
+            });
+          }
         } else {
-          newResults.push({
-            success: false,
-            fileName: file.name,
-            message: 'Could not parse run data from file.'
-          });
+          // Handle TCX/GPX files (single run)
+          const runData = await parseGarminFile(fileContent, fileExtension || '');
+
+          if (runData) {
+            await addRun(runData);
+            newResults.push({
+              success: true,
+              fileName: file.name,
+              message: `Successfully imported run: ${runData.distance} miles on ${runData.date}`,
+              runData
+            });
+          } else {
+            newResults.push({
+              success: false,
+              fileName: file.name,
+              message: 'Could not parse run data from file.'
+            });
+          }
         }
       } catch (error) {
         newResults.push({
@@ -106,6 +142,7 @@ const FileImport: React.FC<FileImportProps> = ({ onClose }) => {
 
   const successCount = results.filter(r => r.success).length;
   const errorCount = results.filter(r => !r.success).length;
+  const totalImportedRuns = results.reduce((sum, r) => sum + (r.runCount || (r.success ? 1 : 0)), 0);
 
   return (
     <Card className="max-w-2xl mx-auto">
@@ -121,17 +158,29 @@ const FileImport: React.FC<FileImportProps> = ({ onClose }) => {
 
       <div className="mb-6">
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          Upload your runs by uploading TCX or GPX files from Garmin Connect, Strava, or other fitness platforms.
+          Upload your runs by uploading TCX, GPX, or CSV files from Garmin Connect, Strava, or other fitness platforms.
         </p>
         
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4">
-          <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">How to export from Garmin Connect:</h4>
-          <ol className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-            <li>1. Go to Garmin Connect and select your activity</li>
-            <li>2. Click the gear icon (⚙️) in the top right</li>
-            <li>3. Select "Export to TCX" or "Export to GPX"</li>
-            <li>4. Upload the downloaded file here</li>
-          </ol>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4">
+            <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Individual Files (TCX/GPX):</h4>
+            <ol className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+              <li>1. Go to Garmin Connect and select your activity</li>
+              <li>2. Click the gear icon (⚙️) in the top right</li>
+              <li>3. Select "Export to TCX" or "Export to GPX"</li>
+              <li>4. Upload the downloaded file here</li>
+            </ol>
+          </div>
+          
+          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md p-4">
+            <h4 className="font-medium text-green-900 dark:text-green-100 mb-2">Bulk Import (CSV):</h4>
+            <ol className="text-sm text-green-800 dark:text-green-200 space-y-1">
+              <li>1. Go to Garmin Connect Data Export</li>
+              <li>2. Request your data export</li>
+              <li>3. Download the activities CSV file</li>
+              <li>4. Upload the CSV file here for bulk import</li>
+            </ol>
+          </div>
         </div>
       </div>
 
@@ -153,7 +202,7 @@ const FileImport: React.FC<FileImportProps> = ({ onClose }) => {
           {isProcessing ? 'Processing files...' : 'Drop files here or click to browse'}
         </h3>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          Supports TCX and GPX files from Garmin, Strava, and other fitness platforms
+          Supports TCX, GPX, and CSV files from Garmin, Strava, and other fitness platforms
         </p>
         
         <Button
@@ -169,7 +218,7 @@ const FileImport: React.FC<FileImportProps> = ({ onClose }) => {
           ref={fileInputRef}
           type="file"
           multiple
-          accept=".tcx,.gpx"
+          accept=".tcx,.gpx,.csv"
           onChange={handleFileSelect}
           className="hidden"
         />
@@ -180,14 +229,14 @@ const FileImport: React.FC<FileImportProps> = ({ onClose }) => {
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium">Import Results</h3>
             <div className="flex space-x-4 text-sm">
-              {successCount > 0 && (
+              {totalImportedRuns > 0 && (
                 <span className="text-green-600 dark:text-green-400">
-                  ✓ {successCount} successful
+                  ✓ {totalImportedRuns} runs imported
                 </span>
               )}
               {errorCount > 0 && (
                 <span className="text-red-600 dark:text-red-400">
-                  ✗ {errorCount} failed
+                  ✗ {errorCount} files failed
                 </span>
               )}
             </div>
