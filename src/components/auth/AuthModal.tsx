@@ -94,7 +94,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
-              className="text-blue-600 hover:text-blue-800 text-sm"
+              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 hover:dark:text-blue-500 text-sm"
             >
               {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Log in'}
             </button>
