@@ -27,10 +27,8 @@ function App() {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) {
-        // Check if this is the expected "session not found" or "Auth session missing" error
-        if (error.status === 403 && 
-            (error.message?.includes('Session from session_id claim in JWT does not exist') ||
-             error.message?.includes('Auth session missing!'))) {
+        // Check if this is a session-related error (session already invalid/missing)
+        if (error.status === 403) {
           console.info('Session was already invalid on server, client cleanup successful');
         } else {
           console.error('Error signing out:', error);
