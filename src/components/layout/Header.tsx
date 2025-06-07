@@ -35,8 +35,10 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) {
-        // Check if this is the expected "session not found" error
-        if (error.status === 403 && error.message?.includes('Session from session_id claim in JWT does not exist')) {
+        // Check if this is the expected "session not found" or "Auth session missing" error
+        if (error.status === 403 && 
+            (error.message?.includes('Session from session_id claim in JWT does not exist') ||
+             error.message?.includes('Auth session missing!'))) {
           console.info('Session was already invalid on server, client cleanup successful');
         } else {
           console.error('Error signing out:', error);
