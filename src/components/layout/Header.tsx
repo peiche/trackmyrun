@@ -32,7 +32,19 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
   ];
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        // Check if this is the expected "session not found" error
+        if (error.status === 403 && error.message?.includes('Session from session_id claim in JWT does not exist')) {
+          console.info('Session was already invalid on server, client cleanup successful');
+        } else {
+          console.error('Error signing out:', error);
+        }
+      }
+    } catch (error) {
+      console.error('Unexpected error during logout:', error);
+    }
     setShowDropdown(false);
   };
 

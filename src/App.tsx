@@ -23,6 +23,22 @@ function App() {
   const [showImport, setShowImport] = useState(false);
   const [user, setUser] = useState<any>(null);
 
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        // Check if this is the expected "session not found" error
+        if (error.status === 403 && error.message?.includes('Session from session_id claim in JWT does not exist')) {
+          console.info('Session was already invalid on server, client cleanup successful');
+        } else {
+          console.error('Error signing out:', error);
+        }
+      }
+    } catch (error) {
+      console.error('Unexpected error during sign out:', error);
+    }
+  };
+
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -30,7 +46,7 @@ function App() {
 
         if (error || !session) {
           // If there's an error or no session, sign out to clear any invalid tokens
-          await supabase.auth.signOut();
+          await handleSignOut();
           setUser(null);
           return;
         }
@@ -39,7 +55,7 @@ function App() {
       } catch (error) {
         console.error('Error initializing auth:', error);
         // On any error, sign out to ensure a clean state
-        await supabase.auth.signOut();
+        await handleSignOut();
         setUser(null);
       }
     };
