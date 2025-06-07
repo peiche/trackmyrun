@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Footprints as Run, Flame, BarChart, Target, LogIn, LogOut, User, ChevronDown } from 'lucide-react';
+import { Footprints as Run, Flame, BarChart, Target, LogIn, LogOut, User, ChevronDown, Settings } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import AuthModal from '../auth/AuthModal';
+import EditProfile from '../profile/EditProfile';
 import Button from '../common/Button';
 import ThemeToggle from '../common/ThemeToggle';
 
@@ -20,6 +21,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showEditProfile, setShowEditProfile] = useState(false);
 
   const navItems: NavItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: <BarChart size={20} /> },
@@ -30,6 +32,11 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    setShowDropdown(false);
+  };
+
+  const handleEditProfile = () => {
+    setShowEditProfile(true);
     setShowDropdown(false);
   };
 
@@ -63,6 +70,13 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
                         Signed in as<br />
                         <span className="font-medium">{user.email}</span>
                       </div>
+                      <button
+                        onClick={handleEditProfile}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center"
+                      >
+                        <Settings size={16} className="mr-2" />
+                        Edit Profile
+                      </button>
                       <button
                         onClick={handleLogout}
                         className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center"
@@ -109,6 +123,15 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
 
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} />
+      )}
+
+      {showEditProfile && user && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <EditProfile 
+            onClose={() => setShowEditProfile(false)} 
+            user={user}
+          />
+        </div>
       )}
     </>
   );
