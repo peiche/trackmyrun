@@ -1,7 +1,7 @@
 /*
-  # RunTracker Database Schema
+  # TrackMyRun Database Schema
   
-  Complete database schema for the RunTracker application including:
+  Complete database schema for the TrackMyRun application including:
   1. User profiles linked to Supabase auth
   2. Running activity records with comprehensive metrics
   3. User-defined goals with progress tracking

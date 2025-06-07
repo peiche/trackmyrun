@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useAppContext } from '../../context/AppContext';
 import Input from '../common/Input';
 import Button from '../common/Button';
 import Card from '../common/Card';
@@ -175,7 +174,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ onClose, user }) => {
             error={errors.username}
             placeholder="Enter your username"
             fullWidth
-            autoComplete="username"
+            autoComplete="off"
           />
           
           <Input
@@ -217,7 +216,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ onClose, user }) => {
             <button
               type="button"
               onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-              className="absolute right-3 top-8 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 dark:hover:text-gray-500"
             >
               {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
@@ -238,7 +237,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ onClose, user }) => {
             <button
               type="button"
               onClick={() => setShowNewPassword(!showNewPassword)}
-              className="absolute right-3 top-8 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 dark:hover:text-gray-500"
             >
               {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
@@ -259,7 +258,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ onClose, user }) => {
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-8 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 dark:hover:text-gray-500"
             >
               {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>

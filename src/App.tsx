@@ -122,7 +122,7 @@ function App() {
   const getTabConfig = () => {
     if (!user) {
       return {
-        title: 'Welcome to RunTracker',
+        title: 'Welcome to TrackMyRun',
         action: null
       };
     }
