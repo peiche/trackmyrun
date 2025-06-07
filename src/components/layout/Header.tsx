@@ -5,6 +5,7 @@ import AuthModal from '../auth/AuthModal';
 import EditProfile from '../profile/EditProfile';
 import Button from '../common/Button';
 import ThemeToggle from '../common/ThemeToggle';
+import { useTheme } from '../../context/ThemeContext';
 
 interface NavItem {
   id: string;
@@ -40,6 +41,9 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
     setShowDropdown(false);
   };
 
+  const { isDark } = useTheme();
+  const image = isDark ? 'boltdotnew-white.png' : 'boltdotnew-black.png';
+
   return (
     <>
       <header className="bg-white dark:bg-gray-800 shadow-sm transition-colors">
@@ -52,7 +56,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
 
             <div className="flex items-center space-x-4">
               <ThemeToggle />
-              
+
               {user ? (
                 <div className="relative">
                   <button
@@ -99,24 +103,30 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
           </div>
 
           {user && (
-            <nav className="flex space-x-4 items-center overflow-x-auto pb-4">
-              {navItems.map(item => (
-                <button
-                  key={item.id}
-                  onClick={() => onTabChange(item.id)}
-                  className={`
+            <div className="flex justify-between">
+              <nav className="flex space-x-4 items-center overflow-x-auto pb-4">
+                {navItems.map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => onTabChange(item.id)}
+                    className={`
                     flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap
                     ${activeTab === item.id
-                      ? 'text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/50'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
-                    }
+                        ? 'text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/50'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+                      }
                   `}
-                >
-                  <span>{item.icon}</span>
-                  <span className="hidden sm:inline ml-2">{item.label}</span>
-                </button>
-              ))}
-            </nav>
+                  >
+                    <span>{item.icon}</span>
+                    <span className="hidden sm:inline ml-2">{item.label}</span>
+                  </button>
+                ))}
+              </nav>
+
+              <div>
+                <a href="https://bolt.new/" target="_blank"><img src={`/images/${image}`} alt="Powered by Bolt.new" width={36} /></a>
+              </div>
+            </div>
           )}
         </div>
       </header>
@@ -127,8 +137,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, user }) => {
 
       {showEditProfile && user && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <EditProfile 
-            onClose={() => setShowEditProfile(false)} 
+          <EditProfile
+            onClose={() => setShowEditProfile(false)}
             user={user}
           />
         </div>
