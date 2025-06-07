@@ -1,18 +1,28 @@
 /*
-  # TrackMyRun Database Schema
+  # Complete database schema setup with proper conflict handling
   
-  Complete database schema for the TrackMyRun application including:
-  1. User profiles linked to Supabase auth
-  2. Running activity records with comprehensive metrics
-  3. User-defined goals with progress tracking
-  4. Analytics views for reporting
-  5. Security policies and triggers
+  1. New Tables
+    - `profiles` - User profile information
+    - `runs` - Individual running activity records  
+    - `goals` - User-defined running goals
+    
+  2. Security
+    - Enable RLS on all tables
+    - Add policies for authenticated users to manage their own data
+    
+  3. Functions & Triggers
+    - Auto-update timestamps
+    - Auto-create profiles for new users
+    
+  4. Views
+    - Analytics views for run statistics and summaries
 */
 
 -- Enable necessary extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Create custom functions
+-- Drop existing functions if they exist and recreate them
+DROP FUNCTION IF EXISTS update_updated_at() CASCADE;
 CREATE OR REPLACE FUNCTION update_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -21,11 +31,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP FUNCTION IF EXISTS handle_new_user() CASCADE;
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO public.profiles (id, username, created_at, updated_at)
-  VALUES (NEW.id, NEW.email, now(), now());
+  VALUES (NEW.id, NEW.email, now(), now())
+  ON CONFLICT (id) DO NOTHING;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -72,9 +84,21 @@ CREATE TABLE IF NOT EXISTS goals (
   completed boolean DEFAULT false,
   description text,
   created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now(),
-  CONSTRAINT goals_has_target CHECK (target_distance IS NOT NULL OR target_pace IS NOT NULL)
+  updated_at timestamptz DEFAULT now()
 );
+
+-- Add constraint if it doesn't exist
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.table_constraints 
+    WHERE constraint_name = 'goals_has_target' 
+    AND table_name = 'goals'
+  ) THEN
+    ALTER TABLE goals ADD CONSTRAINT goals_has_target 
+    CHECK (target_distance IS NOT NULL OR target_pace IS NOT NULL);
+  END IF;
+END $$;
 
 COMMENT ON TABLE goals IS 'User-defined running goals with target metrics';
 COMMENT ON COLUMN goals.target_distance IS 'Target distance in miles (optional)';
@@ -94,6 +118,20 @@ CREATE INDEX IF NOT EXISTS idx_goals_user_completed ON goals(user_id, completed)
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE runs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE goals ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies and recreate them
+DROP POLICY IF EXISTS "Users can read own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
+
+DROP POLICY IF EXISTS "Users can read own runs" ON runs;
+DROP POLICY IF EXISTS "Users can insert own runs" ON runs;
+DROP POLICY IF EXISTS "Users can update own runs" ON runs;
+DROP POLICY IF EXISTS "Users can delete own runs" ON runs;
+
+DROP POLICY IF EXISTS "Users can read own goals" ON goals;
+DROP POLICY IF EXISTS "Users can insert own goals" ON goals;
+DROP POLICY IF EXISTS "Users can update own goals" ON goals;
+DROP POLICY IF EXISTS "Users can delete own goals" ON goals;
 
 -- Create RLS policies for profiles
 CREATE POLICY "Users can read own profile"
@@ -161,6 +199,12 @@ CREATE POLICY "Users can delete own goals"
   TO authenticated
   USING (user_id = auth.uid());
 
+-- Drop existing triggers and recreate them
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON profiles;
+DROP TRIGGER IF EXISTS update_runs_updated_at ON runs;
+DROP TRIGGER IF EXISTS update_goals_updated_at ON goals;
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+
 -- Create triggers for automatic timestamp updates
 CREATE TRIGGER update_profiles_updated_at
   BEFORE UPDATE ON profiles
@@ -183,8 +227,14 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW
   EXECUTE FUNCTION handle_new_user();
 
+-- Drop existing views and recreate them
+DROP VIEW IF EXISTS user_run_stats;
+DROP VIEW IF EXISTS weekly_run_summary;
+DROP VIEW IF EXISTS monthly_run_summary;
+DROP VIEW IF EXISTS goal_progress;
+
 -- Create analytics views
-CREATE OR REPLACE VIEW user_run_stats AS
+CREATE VIEW user_run_stats AS
 SELECT 
   p.id as user_id,
   p.username,
@@ -200,7 +250,7 @@ FROM profiles p
 LEFT JOIN runs r ON p.id = r.user_id
 GROUP BY p.id, p.username;
 
-CREATE OR REPLACE VIEW weekly_run_summary AS
+CREATE VIEW weekly_run_summary AS
 SELECT 
   user_id,
   date_trunc('week', date) as week_start,
@@ -212,7 +262,7 @@ FROM runs
 GROUP BY user_id, date_trunc('week', date)
 ORDER BY user_id, week_start DESC;
 
-CREATE OR REPLACE VIEW monthly_run_summary AS
+CREATE VIEW monthly_run_summary AS
 SELECT 
   user_id,
   date_trunc('month', date) as month_start,
@@ -224,7 +274,7 @@ FROM runs
 GROUP BY user_id, date_trunc('month', date)
 ORDER BY user_id, month_start DESC;
 
-CREATE OR REPLACE VIEW goal_progress AS
+CREATE VIEW goal_progress AS
 SELECT 
   g.*,
   COALESCE(SUM(r.distance), 0) as current_distance,
@@ -235,3 +285,14 @@ LEFT JOIN runs r ON g.user_id = r.user_id
   AND r.date <= g.target_date
 GROUP BY g.id, g.user_id, g.name, g.target_date, g.target_distance, 
          g.target_pace, g.completed, g.description, g.created_at, g.updated_at;
+
+-- Create profiles for existing users if they don't have one
+INSERT INTO public.profiles (id, username, created_at, updated_at)
+SELECT 
+  id,
+  email,
+  COALESCE(created_at, now()),
+  COALESCE(last_sign_in_at, now())
+FROM auth.users
+WHERE id NOT IN (SELECT id FROM public.profiles)
+ON CONFLICT (id) DO NOTHING;
