@@ -28,7 +28,7 @@ function App() {
       const { error } = await supabase.auth.signOut();
       if (error) {
         // Check if this is a session-related error (session already invalid/missing)
-        if (error.status === 403) {
+        if (error.status === 403 || error.code === 'session_not_found') {
           console.info('Session was already invalid on server, client cleanup successful');
         } else {
           console.error('Error signing out:', error);
