@@ -12,7 +12,7 @@ import GoalForm from './components/goals/GoalForm';
 import FileImport from './components/import/FileImport';
 import Button from './components/common/Button';
 import { AppProvider } from './context/AppContext';
-import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { PlusCircle, Upload } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
